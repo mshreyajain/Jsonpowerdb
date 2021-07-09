@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Bootstrap Example</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <form id="empForm" method="post">
+                <div class="form-group">
+                    <h2>Data to be deleted</h2>
+                    <span><label for="empId">Employee ID:</label> <label id="empIdMsg">
+                        </label></span>
+                    <input type="text" class="form-control" name="index" id="index"
+                           placeholder="Enter Employee ID" required>
+
+                    <input type="button" class="btn btn-primary" id="delbtn" value="Delete record"
+                           onclick="deleteRecord();">
+                    </form>
+                </div>
+                <script>
+                    function validateAndGetFormData() {
+                        var indVar = $("#index").val();
+                        if (indVar === "") {
+                            alert("Index is a required Value");
+                            $("#index").focus();
+                            return "";
+                        }
+                        var jsonStrObj = {
+                            index: index,
+                        };
+                        return JSON.stringify(jsonStrObj);
+                    }
+
+                    function resetForm() {
+                        $("#index").val("");
+                        $("#index").focus();
+                    }
+
+                    function createREMOVERecordRequest(token, dbName, relName, reqId) {
+                        var req = "{\n"
+                                + "\"token\" : \""
+                                + token
+                                + "\","
+                                + "\"dbName\": \""
+                                + dbName
+                                + "\",\n" + "\"cmd\" : \"REMOVE\",\n"
+                                + "\"rel\" : \""
+                                + relName
+                                + "\",\n" + "\"record\":"
+                                + reqId
+                                + "\n"
+                                + "}";
+                        return req;
+                    }
+                    function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+                        var url = dbBaseUrl + apiEndPointUrl;
+                        var jsonObj;
+                        $.post(url, reqString, function (result) {
+                            jsonObj = JSON.parse(result);
+                        }).fail(function (result) {
+                            var dataJsonObj = result.responseText;
+                            jsonObj = JSON.parse(dataJsonObj);
+                        });
+                        return jsonObj;
+                    }
+
+
+                    function deleteRecord() {
+                        var jsonStr = validateAndGetFormData();
+                        if (jsonStr === "") {
+                            return;
+                        }
+
+
+
+
+                        var removeReqStr = createREMOVERecordRequest("90935887|-31948845405262598|90944875", "Sample", "Emp-Rel", parseInt(document.getElementById("index").value));
+                       
+                        jQuery.ajaxSetup({async: false});
+                        var resultObj = executeCommand(removeReqStr,
+                                "http://api.login2explore.com:5577", "/api/iml");
+                        alert("Done");
+                        jQuery.ajaxSetup({async: true});
+                        resetForm();
+                    }
+                </script>
+
+                </body>
+                </html>
+
